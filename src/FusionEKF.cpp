@@ -12,8 +12,6 @@ using std::vector;
  * Constructor.
  */
 FusionEKF::FusionEKF() {
-    cout << "FusionEKF()" << endl;
-
     is_initialized_ = false;
 
     previous_timestamp_ = 0;
@@ -57,18 +55,10 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
      *  Initialization
      ****************************************************************************/
     if (!is_initialized_) {
-        /**
-            * Initialize the state ekf_.x_ with the first measurement.
-            * Create the covariance matrix.
-            * Remember: you'll need to convert radar from polar to cartesian coordinates.
-        */
-
         // first measurement
-        cout << "EKF: " << endl;
         VectorXd x_in(4);
         x_in << 0, 0, 0, 0;
 
-        cout << measurement_pack.sensor_type_ << measurement_pack.raw_measurements_.size() << endl;
         if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
             // Convert radar from polar to cartesian coordinates and initialize state.
             float ro = measurement_pack.raw_measurements_(0);
@@ -80,9 +70,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
             x_in(3) = ro_dot * cos(theta);
         }
         else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
-            // Initialize state.
             // LASER only measures location leave velocity default.
-            cout << x_in.size() << measurement_pack.raw_measurements_.size() << endl;
             x_in(0) = measurement_pack.raw_measurements_(0);
             x_in(1) = measurement_pack.raw_measurements_(1);
         }
@@ -95,9 +83,9 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
         //state covariance matrix P
         ekf_.P_ = MatrixXd(4, 4);
         ekf_.P_ << 1, 0, 0, 0,
-                  0, 1, 0, 0,
-                  0, 0, 1, 0,
-                  0, 0, 0, 1;
+                   0, 1, 0, 0,
+                   0, 0, 1, 0,
+                   0, 0, 0, 1;
 
         // done initializing, no need to predict or update
         is_initialized_ = true;
@@ -126,8 +114,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
          dt, 0,
          0, dt;
 
-    cout <<"G " << endl << G << endl;
-
     ekf_.Q_ = G * Q_v * G.transpose();
 
     ekf_.Predict();
@@ -153,5 +139,4 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     // print the output
     cout << "x_ = " << endl << ekf_.x_ << endl;
     cout << "P_ = " << endl << ekf_.P_ << endl;
-    // cout << "Q_ = " << endl << ekf_.Q_ << endl;
 }
