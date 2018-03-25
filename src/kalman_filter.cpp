@@ -35,11 +35,12 @@ void KalmanFilter::Update(const VectorXd &z) {
   MatrixXd S  = H_ * P_ * Ht + R_;
   MatrixXd K  = P_ * Ht * S.inverse();
 
-  //new state
+  // new state
   x_ = x_ + (K * y);
   P_ = (MatrixXd::Identity(x_.size(), x_.size()) - K * H_) * P_;
 }
 
+// the non-linear radar measurement functions
 static VectorXd h(const VectorXd& x_state)
 {
   float px = x_state(0);
@@ -66,7 +67,7 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   while (y(1) < -M_PI) y(1) += 2*M_PI;
   while (y(1) >  M_PI) y(1) -= 2*M_PI;
 
-  //new state
+  // new state
   x_ = x_ + (K * y);
   P_ = (MatrixXd::Identity(x_.size(), x_.size()) - K * H_) * P_;
 }
